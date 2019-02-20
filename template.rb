@@ -104,6 +104,4 @@ services:
 
   after_bundle do
     run 'guard init'
-
-    run 'docker-compose build'
   end
