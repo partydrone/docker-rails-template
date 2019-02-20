@@ -105,9 +105,5 @@ services:
   after_bundle do
     run 'guard init'
 
-    git :init
-    git add: '.'
-    git commit: "-a -m 'Initial commit'"
-
     run 'docker-compose build'
   end
