@@ -41,7 +41,7 @@ CMD [ "puma", "-C", "config/puma.rb" ]
 
 CODE
 
-file '.dockerignore', <<-CODE
+file '.dockerignore', <<-EOF
 .git*
 tmp/
 .dockerignore
@@ -50,7 +50,7 @@ docker-compose.override.yml
 Dockerfile
 README.md
 
-CODE
+EOF
 
 file 'docker-compose.yml', <<-YAML
 version: '3.7'
@@ -156,7 +156,8 @@ end
 
   RUBY
 
-  insert_into_file 'test_helper.rb', after: "require 'rails/test_help'\n" do <<-RUBY
+  insert_into_file 'test_helper.rb', after: "require 'rails/test_help'\n" do
+    <<-RUBY
 
 require 'minitest/rails'
 require 'minitest/reporters'
@@ -165,13 +166,14 @@ Dir[File.expand_path('test/support/**/*.rb')].each { |file| require file }
 
 Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new(color: true)
 
-  RUBY
+    RUBY
   end
 
-  insert_into_file 'application_system_test_case.rb', after: 'require "test_helper"\n' do <<-RUBY
+  insert_into_file 'application_system_test_case.rb', after: 'require "test_helper"\n' do
+    <<-RUBY
 require 'minitest/rails/capybara'
 
-  RUBY
+    RUBY
   end
 end
 
