@@ -37,8 +37,34 @@ services:
     build: .
     depends_on:
       - 'postgres'
-    environment:
-      - VIRTUAL_HOST=localhost
+      - 'redis'
+    env_file:
+      - '.env'
+    ports:
+      - '3000:3000'
+    volumes:
+      - '.:/srv/#{app_name}'
+
+  sidekiq:
+    command: sidekiq -C config/sidekiq.yml.erb
+    depends_on:
+      - 'postgres'
+      - 'redis'
+    env_file:
+      - '.env'
+    image: #{app_name}_app:latest
+    volumes:
+      - '.:/srv/#{app_name}'
+
+  cable:
+    command: puma -p 28080 cable/config.ru
+    depends_on:
+      - 'redis'
+    env_file:
+      - '.env'
+    image: #{app_name}_app:latest
+    ports:
+      - '28080:28080'
     volumes:
       - '.:/srv/#{app_name}'
 
@@ -49,10 +75,9 @@ services:
     volumes:
       - './tmp/data/postgres:/var/lib/postgresql/data'
 
-  proxy:
-    image: 'jwilder/nginx-proxy:alpine'
-    ports:
-      - '80:80'
+  redis:
+    command: redis-server --requirepass yourpassword
+    image: 'redis:4.0-alpine'
     volumes:
-      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+      - './tmp/data/redis:/data'
 YAML
