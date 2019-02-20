@@ -4,7 +4,7 @@ FROM ruby:2.6-alpine
 
 ENV APP_DIR /srv/#{app_name}
 
-RUN apk update && apk add build-base nodejs postgresql-dev
+RUN apk update && apk add build-base tzdata nodejs postgresql-dev
 
 RUN mkdir ${APP_DIR}
 WORKDIR ${APP_DIR}
@@ -38,21 +38,31 @@ services:
     depends_on:
       - 'postgres'
     environment:
-      - VIRTUAL_HOST=localhost
+      - PGHOST=postgres
+      - PGUSER=postgres
+    ports:
+      - '3000:3000'
     volumes:
       - '.:/srv/#{app_name}'
 
   postgres:
-    env_file:
-      - '.env'
     image: 'postgres:10.3-alpine'
+    restart: always
     volumes:
       - './tmp/data/postgres:/var/lib/postgresql/data'
-
-  proxy:
-    image: 'jwilder/nginx-proxy:alpine'
-    ports:
-      - '80:80'
-    volumes:
-      - '/var/run/docker.sock:/tmp/docker.sock:ro'
 YAML
+
+file 'docker-compose.override.yml', <<-YAML
+# Use this file to override any settings in the base Compose file.
+version: '3.7'
+
+services:
+  app:
+  postgres:
+YAML
+
+append_to_file '.gitignore', <<-EOF
+
+# Ignore local Docker overrides
+docker-compose.override.yml
+EOF
