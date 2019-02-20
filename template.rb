@@ -168,7 +168,7 @@ Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new(color: true)
   RUBY
   end
 
-  insert_into_file 'application_system_test_case.rb', after 'require "test_helper"\n' do <<-RUBY
+  insert_into_file 'application_system_test_case.rb', after: 'require "test_helper"\n' do <<-RUBY
 require 'minitest/rails/capybara'
 
   RUBY
