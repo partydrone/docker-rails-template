@@ -21,7 +21,7 @@ end
 file 'Dockerfile', <<-CODE
 FROM ruby:2.6-alpine
 
-ENV APP_DIR /srv/<%= @name %>
+ENV APP_DIR /srv/#{app_name}
 
 RUN apk update && apk add build-base nodejs postgresql-dev
 
@@ -33,7 +33,7 @@ RUN bundle install --binstubs --system -j4
 
 COPY . .
 
-LABEL maintainer="Nick Janetakis <nick.janetakis@gmail.com>"
+LABEL maintainer="Andrew Porter <partydrone@icloud.com>"
 
 CMD [ "puma", "-C", "config/puma.rb" ]
 
@@ -73,7 +73,7 @@ services:
       - 'postgres'
       - 'redis'
     volumes:
-      - '.:/srv/<%= @name %>'
+      - '.:/srv/#{app_name}'
     env_file:
       - '.env'
 
@@ -84,9 +84,9 @@ services:
       - 'redis'
     env_file:
       - '.env'
-    image: <%= @name %>_app:latest
+    image: #{app_name}_app:latest
     volumes:
-      - '.:/srv/<%= @name %>'
+      - '.:/srv/#{app_name}'
 
   cable:
     command: puma -p 28080 cable/config.ru
@@ -94,10 +94,20 @@ services:
       - 'redis'
     env_file:
       - '.env'
-    image: <%= @name %>_app:latest
+    image: #{app_name}_app:latest
     ports:
       - '28080:28080'
     volumes:
-      - '.:/srv/<%= @name %>'
+      - '.:/srv/#{app_name}'
 
   CODE
+
+  after_bundle do
+    run 'guard init'
+
+    git :init
+    git add: '.'
+    git commit: "-a -m 'Initial commit'"
+
+    run 'docker-compose build'
+  end
