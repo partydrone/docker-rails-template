@@ -105,7 +105,7 @@ services:
 YAML
 
 inside 'test' do
-  file 'support/omniauth.rb' <<-RUBY
+  file 'support/omniauth.rb', <<-RUBY
 OmniAuth.config.test_mode = true
 
 # Configure mock of supported identity provider here:
@@ -120,7 +120,7 @@ OmniAuth.config.test_mode = true
 # })
   RUBY
 
-  file 'support/custom_expectations/pundit.rb' <<-RUBY
+  file 'support/custom_expectations/pundit.rb', <<-RUBY
 module Minitest::Assertions
   def assert_permit(user, record, action)
     msg = "User #{user.inspect} should be permitted to #{action} #{record}, but cannot."
